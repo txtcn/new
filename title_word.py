@@ -32,7 +32,7 @@ def parse_word(title, txt):
       if i in count:
         count[i] += 1
 
-  for word, n in count.items():
+  for word, n in sorted(count.items(), key=lambda x: len(x[0])):
     if n > 3:
       if len(word) > 2:
         for i in ngram(word, len(word)):
