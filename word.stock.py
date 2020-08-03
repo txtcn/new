@@ -44,7 +44,7 @@ class StockA:
       sleep(3)
       for i in range(999):
         try:
-          li = ak.stock_info_change_name(stock=code)
+          li = ak.stock_info_change_name(stock=code) or []
         except Exception as err:
           print(err)
           sleep(60)
