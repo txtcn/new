@@ -19,7 +19,7 @@ def ngram(li, size):
 def ngram_line(txt):
   for s in RE_PUNCTUATION.split(txt):
     li = tokenize(s)
-    for i in ngram(li, 12):
+    for i in ngram(li, min(14, len(li))):
       yield i
 
 
