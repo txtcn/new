@@ -16,7 +16,7 @@ def ngram(li, size):
 def ngram_line(txt):
   for s in RE_PUNCTUATION.split(txt):
     li = tokenize(s)
-    for i in ngram(li, 8):
+    for i in ngram(li, 9):
       yield i
 
 
@@ -48,7 +48,6 @@ def parse_word(title, txt):
 
 
 def _parse(filepath):
-  print(filepath)
   count = Counter()
 
   def _word(title, txt):
@@ -76,6 +75,7 @@ def _parse(filepath):
     if title:
       _word(title, txt)
 
+  print(filepath)
   return total, count
 
 
@@ -95,11 +95,11 @@ class Parse:
 if __name__ == "__main__":
   from os import walk, cpu_count
   from os.path import join, dirname, basename, abspath
-  from concurrent.futures import ThreadPoolExecutor
+  from concurrent.futures import ProcessPoolExecutor
 
   outfile = abspath(__file__)[:-2] + "txt"
   parse = Parse()
-  with ThreadPoolExecutor(max_workers=cpu_count()) as executor:
+  with ProcessPoolExecutor(max_workers=cpu_count()) as executor:
     for root, _, file_li in walk("/share/txt/data"):
       for filename in file_li:
         if filename.endswith(".zd"):
