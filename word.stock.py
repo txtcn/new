@@ -41,7 +41,7 @@ class StockA:
     if code not in self.exist:
       self.exist.add(code)
       cout.green << (code, name)
-      sleep(3)
+      sleep(5)
       li = ak.stock_info_change_name(stock=code)
       for i in li:
         i = format_a(i)

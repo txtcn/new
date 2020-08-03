@@ -15,6 +15,8 @@ def main(
       len_i = len(i)
       if len_i <= 1 or len_i > 7 or i.isascii():
         continue
+      if i[0].isdigit() and '年' in i:
+        continue
       word_set.add(i.lower())
 
   for i in sorted(word_set):
