@@ -132,8 +132,8 @@ if __name__ == "__main__":
       else:
         parse(*r)
         min_n = max(int(parse.total * 0.00001), 3)
-        with open(outfile, "w") as out:
+        with open(outfile, "wb") as out:
           out.write(str(parse.total) + "\n")
           for k, v in sorted(parse.count.items(), key=itemgetter(1), reverse=True):
             if v > min_n:
-              out.write("%s,%s\n" % (k, v))
+              out.write(b"%s,%s\n" % (k, v))
