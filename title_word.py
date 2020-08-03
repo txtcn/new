@@ -49,14 +49,14 @@ def find_word(title, txt):
 class Find:
   def __init__(self):
     self.count = Counter()
-    self.n = 0
+    self.total = 0
 
   def _word(self, title, txt):
     for i in find_word(title, txt):
       self.count[i] += 1
 
   def __lshift__(self, filepath):
-    self.n += 1
+    self.total += 1
     with zd.open(filepath) as f:
       txt = []
       title = None
@@ -87,8 +87,9 @@ if __name__ == "__main__":
         filepath = join(root, filename)
         print(filepath)
         find << filepath
+        min_n = max(int(find.total * 0.0001), 3)
         for k, v in sorted(find.count.items(), key=itemgetter(1)):
-          if v > 3:
+          if v > min_n:
             print(k, v)
 
       input()
