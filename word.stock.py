@@ -8,7 +8,7 @@ from time import sleep
 
 
 def format_a(name):
-  return half(name.replace(' ', '').lstrip("*")).lower()
+  return half(name.replace(' ', '').replace("*", '')).lower()
 
 
 class Name:
