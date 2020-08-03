@@ -23,7 +23,8 @@ def find_word(title, txt):
   count = Counter()
 
   for i in ngram_line(title):
-    count[i] += 1
+    if len(i) > 1:
+      count[i] += 1
 
   total = len(title) + sum(len(i) for i in txt)
   for line in txt:
@@ -40,20 +41,22 @@ def find_word(title, txt):
   r = []
   for word, n in count.items():
     if n > 3 and (n * len(word)) / total > 0.005:
-      word = "".join(word)
-      r.append(word)
+      _word = "".join(word)
+      r.append(_word)
   return r
 
 
 class Find:
   def __init__(self):
     self.count = Counter()
+    self.n = 0
 
   def _word(self, title, txt):
     for i in find_word(title, txt):
       self.count[i] += 1
 
   def __lshift__(self, filepath):
+    self.n += 1
     with zd.open(filepath) as f:
       txt = []
       title = None

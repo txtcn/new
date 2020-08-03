@@ -24,7 +24,8 @@ def tokenize(text):
       char = char.strip()
       if not char:
         append()
-      t.append(char)
+      else:
+        t.append(char)
   append()
   return output
 
