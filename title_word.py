@@ -2,7 +2,7 @@
 import zd
 from cn import tokenize, RE_PUNCTUATION
 from nltk import ngrams
-from collections import Counter
+from collections import Counter, defaultdict
 from operator import itemgetter
 from acora import AcoraBuilder
 from itertools import groupby
@@ -24,7 +24,7 @@ def ngram_line(txt):
 
 
 def parse_word(title, txt):
-  count = {}
+  count = Counter()
 
   # word_set = set()
   total = len(title) + len(txt)
@@ -41,11 +41,17 @@ def parse_word(title, txt):
     if n >= 3:
       if len(word) > 2:
         for i in ngram(word, len(word)):
-          if i in count:
-            count[i] -= n
+          count[i] -= n
 
   r = []
   for word, n in count.items():
+    len_word = len(word)
+    if len_word > 2:
+      for i in ngram(word, len_word):
+        if n < count[i]:
+          n = 0
+          break
+
     if n > 3 and (n * len(word)) / total > 0.005:
       r.append(word)
   return r
