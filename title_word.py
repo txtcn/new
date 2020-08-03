@@ -75,8 +75,7 @@ def _parse(filepath):
     if title:
       _word(title, txt)
 
-  print(filepath)
-  return total, count
+  return total, dict(count)
 
 
 class Parse:
@@ -85,30 +84,39 @@ class Parse:
     self.total = 0
     self.lock = threading.Lock()
 
-  def __call__(self, filepath):
-    total, count = _parse(filepath)
+  def __call__(self, total, count):
     with self.lock:
       self.total += total
-      self.count += count
+      self.count += Counter(count)
 
 
 if __name__ == "__main__":
   from os import walk, cpu_count
   from os.path import join, dirname, basename, abspath
-  from concurrent.futures import ProcessPoolExecutor
+  from concurrent.futures import ProcessPoolExecutor, as_completed
 
   outfile = abspath(__file__)[:-2] + "txt"
   parse = Parse()
   with ProcessPoolExecutor(max_workers=cpu_count()) as executor:
+    todo = {}
     for root, _, file_li in walk("/share/txt/data"):
       for filename in file_li:
         if filename.endswith(".zd"):
           filepath = join(root, filename)
-          executor.submit(parse, filepath)
+          todo[executor.submit(_parse, filepath)] = filepath
+    for future in as_completed(todo):
+      try:
+        print(todo[future])
+        r = future.result()
+        print(r)
+      except Exception as exc:
+        print('%r generated an exception: %s' % exc)
+      else:
+        parse(*r)
+
         min_n = max(int(parse.total * 0.00001), 3)
         with open(outfile, "w") as out:
           out.write(str(parse.total) + "\n")
           for k, v in sorted(parse.count.items(), key=itemgetter(1), reverse=True):
             if v > min_n:
               out.write("%s,%s\n" % (k, v))
-        # input()
