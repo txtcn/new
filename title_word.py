@@ -10,19 +10,27 @@ RE_PUNCTUATION = re.compile(
 )
 
 
-def find_word(title, txt):
-  title = title.lower()
-  count = Counter()
-
-  for s in RE_PUNCTUATION.split(title):
+def ngram(txt):
+  for s in RE_PUNCTUATION.split(txt):
     li = tokenize(s)
     for n in range(2, 8):
       for i in ngrams(li, n):
-        count[i] += 1
+        yield i
+
+
+def find_word(title, txt):
+  count = Counter()
+
+  for i in ngram(title):
+    count[i] += 1
 
   for line in txt:
-    for i in RE_PUNCTUATION.split(line):
-      print(i)
+    for i in ngram(line):
+      if i in count:
+        count[i] += 1
+
+  for word, n in sorted(count.items(), key=lambda x: x[1]):
+    print(word, n)
 
   input()
 
@@ -38,7 +46,7 @@ class Find:
       title = None
       it = iter(f)
       for i in it:
-        i = i[:-1]
+        i = i[:-1].lower()
         if i.startswith("➜"):
           next(it)
           if title:
@@ -53,7 +61,12 @@ class Find:
 
 
 if __name__ == "__main__":
-  from glob import glob
+  from os import walk
+  from os.path import join
+
   find = Find()
-  for i in glob("/share/txt/data/*.zd"):
-    find << i
+  for root, _, file_li in walk("/share/txt/data"):
+    for filename in file_li:
+      if filename.endswith(".zd"):
+        filepath = join(root, filename)
+        find << filepath
