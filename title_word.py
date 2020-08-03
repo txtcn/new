@@ -4,7 +4,6 @@ from cn import tokenize, RE_PUNCTUATION
 from nltk import ngrams
 from collections import Counter
 from operator import itemgetter
-import threading
 
 
 def ngram(li, size):
@@ -82,12 +81,10 @@ class Parse:
   def __init__(self):
     self.count = Counter()
     self.total = 0
-    self.lock = threading.Lock()
 
   def __call__(self, total, count):
-    with self.lock:
-      self.total += total
-      self.count += Counter(count)
+    self.total += total
+    self.count += Counter(count)
 
 
 if __name__ == "__main__":
@@ -105,15 +102,14 @@ if __name__ == "__main__":
           filepath = join(root, filename)
           todo[executor.submit(_parse, filepath)] = filepath
     for future in as_completed(todo):
+      filepath = todo[future]
+      print(filepath)
       try:
-        print(todo[future])
         r = future.result()
-        print(r)
       except Exception as exc:
-        print('%r generated an exception: %s' % exc)
+        print(exc)
       else:
         parse(*r)
-
         min_n = max(int(parse.total * 0.00001), 3)
         with open(outfile, "w") as out:
           out.write(str(parse.total) + "\n")
