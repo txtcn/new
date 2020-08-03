@@ -56,7 +56,6 @@ class Find:
       self.count[i] += 1
 
   def __lshift__(self, filepath):
-    self.total += 1
     with zd.open(filepath) as f:
       txt = []
       title = None
@@ -64,6 +63,7 @@ class Find:
       for i in it:
         i = i[:-1].lower()
         if i.startswith("➜"):
+          self.total += 1
           next(it)
           if title:
             self._word(title, txt)
