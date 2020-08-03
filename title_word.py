@@ -78,7 +78,9 @@ class Find:
 
 if __name__ == "__main__":
   from os import walk
-  from os.path import join
+  from os.path import join, dirname, basename, abspath
+
+  outfile = abspath(__file__)[:-2] + "txt"
 
   find = Find()
   for root, _, file_li in walk("/share/txt/data"):
@@ -88,8 +90,8 @@ if __name__ == "__main__":
         print(filepath)
         find << filepath
         min_n = max(int(find.total * 0.0001), 3)
-        for k, v in sorted(find.count.items(), key=itemgetter(1)):
-          if v > min_n:
-            print(k, v)
-
+        with open(outfile, "w") as out:
+          for k, v in sorted(find.count.items(), key=itemgetter(1), reverse=True):
+            if v > min_n:
+              out.write("%s,%s" % (k, v))
       # input()
