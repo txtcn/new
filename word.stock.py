@@ -62,8 +62,8 @@ def main():
 
   # 港股、美股
   for func,attr in (
-    (ak.stock_hk_spot,'name'),
     (ak.stock_us_spot, 'cname'),
+    (ak.stock_hk_spot,'name'),
   ):
     li = func()
     for index, i in li.iterrows():
