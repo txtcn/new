@@ -93,5 +93,5 @@ if __name__ == "__main__":
         with open(outfile, "w") as out:
           for k, v in sorted(find.count.items(), key=itemgetter(1), reverse=True):
             if v > min_n:
-              out.write("%s,%s" % (k, v))
+              out.write("%s,%s\n" % (k, v))
       # input()
