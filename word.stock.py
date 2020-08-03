@@ -59,20 +59,11 @@ def main():
       i = i.strip("\n")
       if i:
         NAME << i
-  stock_a = StockA()
 
-  # A股全部
-  li = ak.stock_info_a_code_name()
-  for index, i in li.iterrows():
-    stock_a(i['code'], i['name'])
-
-  li = ak.stock_info_sz_delist(indicator="终止上市公司")
-  for index, i in li.iterrows():
-    stock_a(i['证券代码'], i['证券简称'])
-
+  # 港股、美股
   for func,attr in (
+    (ak.stock_hk_spot,'name'),
     (ak.stock_us_spot, 'cname'),
-    (ak.stock_hk_spot,'name')
   ):
     li = func()
     for index, i in li.iterrows():
@@ -84,6 +75,17 @@ def main():
       if name.endswith("类股") or ' ' in name or '&#' in name:
         continue
       NAME << name
+
+  # A股全部
+  stock_a = StockA()
+  li = ak.stock_info_a_code_name()
+  for index, i in li.iterrows():
+    stock_a(i['code'], i['name'])
+
+  li = ak.stock_info_sz_delist(indicator="终止上市公司")
+  for index, i in li.iterrows():
+    stock_a(i['证券代码'], i['证券简称'])
+
   with open(outfile, "w") as out:
     out.write(str(NAME))
 
