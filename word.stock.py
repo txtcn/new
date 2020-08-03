@@ -41,15 +41,22 @@ class StockA:
     if code not in self.exist:
       self.exist.add(code)
       cout.green << (code, name)
-      sleep(5)
-      li = ak.stock_info_change_name(stock=code)
-      for i in li:
-        i = format_a(i)
-        if i[0] in "g" or "(" in i or (
-          i.startswith("s") and not i.startswith("st")
-        ):
-          continue
-        NAME << i
+      sleep(3)
+      for i in range(999):
+        try:
+          li = ak.stock_info_change_name(stock=code)
+        except Exception as err:
+          print(err)
+          sleep(60)
+        else:
+          for i in li:
+            i = format_a(i)
+            if i[0] in "g" or "(" in i or (
+              i.startswith("s") and not i.startswith("st")
+            ):
+              continue
+            NAME << i
+          return
 
 
 def main():
