@@ -32,7 +32,12 @@ def parse_word(title, txt):
   count = Counter()
 
   word_set = set()
-  title = title.decode(utf8)
+  _title = title.decode(utf8, 'ignore')
+  if _title.encode(utf8) != title:
+    print(title)
+    print(_title.encode(utf8))
+    print(_title)
+  title = _title
   for i in ngram_line(title):
     if len(i) > 1:
       i = b"".join(i)
@@ -116,28 +121,29 @@ if __name__ == "__main__":
   outfile = abspath(__file__)[:-2] + "txt"
   print(outfile)
   parse = Parse()
-  with ProcessPoolExecutor(max_workers=cpu_count()) as executor:
-    todo = {}
-    for root, _, file_li in walk("/share/txt/data"):
-      for filename in file_li:
-        if filename.endswith(".zd"):
-          filepath = join(root, filename)
-          todo[executor.submit(_parse, filepath)] = filepath
-    for future in as_completed(todo):
-      filepath = todo[future]
-      print(">", filepath)
-      try:
-        r = future.result()
-      except Exception as exc:
-        print(exc)
-      else:
-        parse(*r)
-        min_n = max(int(parse.total * 0.00001), 3)
-        t = [b"%s" % parse.total]
-        for k, v in sorted(parse.count.items(), key=itemgetter(1), reverse=True):
-          if v > min_n:
-            t.append(b"%s,%s" % (k, v))
-        t = b"\n".join(t)
-        print(t)
-        with open(outfile, "wb") as out:
-          out.write(t)
+  # with ProcessPoolExecutor(max_workers=cpu_count()) as executor:
+  todo = {}
+  for root, _, file_li in walk("/share/txt/data"):
+    for filename in file_li:
+      if filename.endswith(".zd"):
+        filepath = join(root, filename)
+        _parse(filepath)
+        # todo[executor.submit(_parse, filepath)] = filepath
+  for future in as_completed(todo):
+    filepath = todo[future]
+    print(">", filepath)
+    try:
+      r = future.result()
+    except Exception as exc:
+      print(exc)
+    else:
+      parse(*r)
+      min_n = max(int(parse.total * 0.00001), 3)
+      t = [b"%s" % parse.total]
+      for k, v in sorted(parse.count.items(), key=itemgetter(1), reverse=True):
+        if v > min_n:
+          t.append(b"%s,%s" % (k, v))
+      t = b"\n".join(t)
+      print(t)
+      with open(outfile, "wb") as out:
+        out.write(t)
