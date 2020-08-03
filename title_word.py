@@ -110,9 +110,11 @@ class Parse:
 if __name__ == "__main__":
   from os import walk, cpu_count
   from os.path import join, dirname, basename, abspath
+  # from concurrent.futures import ThreadPoolExecutor as ProcessPoolExecutor, as_completed
   from concurrent.futures import ProcessPoolExecutor, as_completed
 
   outfile = abspath(__file__)[:-2] + "txt"
+  print(outfile)
   parse = Parse()
   with ProcessPoolExecutor(max_workers=cpu_count()) as executor:
     todo = {}
@@ -120,11 +122,10 @@ if __name__ == "__main__":
       for filename in file_li:
         if filename.endswith(".zd"):
           filepath = join(root, filename)
-          # _parse(filepath)
           todo[executor.submit(_parse, filepath)] = filepath
     for future in as_completed(todo):
       filepath = todo[future]
-      print(filepath)
+      print(">", filepath)
       try:
         r = future.result()
       except Exception as exc:
@@ -132,8 +133,11 @@ if __name__ == "__main__":
       else:
         parse(*r)
         min_n = max(int(parse.total * 0.00001), 3)
+        t = [b"%s" % parse.total]
+        for k, v in sorted(parse.count.items(), key=itemgetter(1), reverse=True):
+          if v > min_n:
+            t.append(b"%s,%s" % (k, v))
+        t = b"\n".join(t)
+        print(t)
         with open(outfile, "wb") as out:
-          out.write(bytes(parse.total) + b"\n")
-          for k, v in sorted(parse.count.items(), key=itemgetter(1), reverse=True):
-            if v > min_n:
-              out.write(b"%s,%s\n" % (k, v))
+          out.write(t)
