@@ -89,7 +89,7 @@ if __name__ == "__main__":
         filepath = join(root, filename)
         print(filepath)
         find << filepath
-        min_n = max(int(find.total * 0.0001), 3)
+        min_n = max(int(find.total * 0.00001), 3)
         with open(outfile, "w") as out:
           for k, v in sorted(find.count.items(), key=itemgetter(1), reverse=True):
             if v > min_n:
