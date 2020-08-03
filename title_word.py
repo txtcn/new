@@ -92,4 +92,4 @@ if __name__ == "__main__":
           if v > min_n:
             print(k, v)
 
-      input()
+      # input()
