@@ -4,6 +4,7 @@ from cn import tokenize, RE_PUNCTUATION
 from nltk import ngrams
 from collections import Counter
 from operator import itemgetter
+import threading
 
 
 def ngram(li, size):
@@ -19,7 +20,7 @@ def ngram_line(txt):
       yield i
 
 
-def find_word(title, txt):
+def parse_word(title, txt):
   count = Counter()
 
   for i in ngram_line(title):
@@ -46,52 +47,68 @@ def find_word(title, txt):
   return r
 
 
-class Find:
+def _parse(filepath):
+  print(filepath)
+  count = Counter()
+
+  def _word(title, txt):
+    for i in parse_word(title, txt):
+      count[i] += 1
+
+  total = 0
+
+  with zd.open(filepath) as f:
+    txt = []
+    title = None
+    it = iter(f)
+    for i in it:
+      i = i[:-1].lower()
+      if i.startswith("➜"):
+        next(it)
+        if title:
+          _word(title, txt)
+        title = i[1:]
+        txt = []
+        total += 1
+      else:
+        if i:
+          txt.append(i)
+    if title:
+      _word(title, txt)
+
+  return total, count
+
+
+class Parse:
   def __init__(self):
     self.count = Counter()
     self.total = 0
+    self.lock = threading.Lock()
 
-  def _word(self, title, txt):
-    for i in find_word(title, txt):
-      self.count[i] += 1
-
-  def __lshift__(self, filepath):
-    with zd.open(filepath) as f:
-      txt = []
-      title = None
-      it = iter(f)
-      for i in it:
-        i = i[:-1].lower()
-        if i.startswith("➜"):
-          self.total += 1
-          next(it)
-          if title:
-            self._word(title, txt)
-          title = i[1:]
-          txt = []
-        else:
-          if i:
-            txt.append(i)
-      if title:
-        self._word(title, txt)
+  def __call__(self, filepath):
+    total, count = _parse(filepath)
+    with self.lock:
+      self.total += total
+      self.count += count
 
 
 if __name__ == "__main__":
-  from os import walk
+  from os import walk, cpu_count
   from os.path import join, dirname, basename, abspath
+  from concurrent.futures import ThreadPoolExecutor
 
   outfile = abspath(__file__)[:-2] + "txt"
-
-  find = Find()
-  for root, _, file_li in walk("/share/txt/data"):
-    for filename in file_li:
-      if filename.endswith(".zd"):
-        filepath = join(root, filename)
-        print(filepath)
-        find << filepath
-        min_n = max(int(find.total * 0.00001), 3)
+  parse = Parse()
+  with ThreadPoolExecutor(max_workers=cpu_count()) as executor:
+    for root, _, file_li in walk("/share/txt/data"):
+      for filename in file_li:
+        if filename.endswith(".zd"):
+          filepath = join(root, filename)
+          executor.submit(parse, filepath)
+        min_n = max(int(parse.total * 0.00001), 3)
         with open(outfile, "w") as out:
-          for k, v in sorted(find.count.items(), key=itemgetter(1), reverse=True):
+          out.write(str(parse.total) + "\n")
+          for k, v in sorted(parse.count.items(), key=itemgetter(1), reverse=True):
             if v > min_n:
               out.write("%s,%s\n" % (k, v))
-      # input()
+        # input()
