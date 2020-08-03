@@ -93,6 +93,19 @@ class Parse:
     self.count += Counter(count)
 
 
+def word_join(li):
+  r = []
+  pre_ascii = False
+  for i in range(len(li)):
+    t = li[i]
+    is_ascii = t.isascii()
+    if pre_ascii and is_ascii:
+      t = " " + t
+    r.append(t)
+    pre_ascii = is_ascii
+  return "".join(r)
+
+
 if __name__ == "__main__":
   from os import walk, cpu_count
   from os.path import join, dirname, basename, abspath
@@ -123,7 +136,7 @@ if __name__ == "__main__":
         t = [str(parse.total)]
         for k, v in sorted(parse.count.items(), key=itemgetter(1), reverse=True):
           if v > min_n:
-            t.append("%s,%s" % ("".join(k), v))
+            t.append("%s,%s" % (word_join(k), v))
         t = "\n".join(t)
         with open(outfile, "w") as out:
           out.write(t)
