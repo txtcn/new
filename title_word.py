@@ -117,6 +117,7 @@ if __name__ == "__main__":
   from os.path import join, dirname, basename, abspath
   # from concurrent.futures import ThreadPoolExecutor as ProcessPoolExecutor, as_completed
   from concurrent.futures import ProcessPoolExecutor, as_completed
+  from tqdm import tqdm
 
   outfile = abspath(__file__)[:-2] + "txt"
   print(outfile)
@@ -129,7 +130,9 @@ if __name__ == "__main__":
           filepath = join(root, filename)
           # _parse(filepath)
           todo[executor.submit(_parse, filepath)] = filepath
+    pbar = tqdm(total=len(todo))
     for future in as_completed(todo):
+      pbar.update(1)
       filepath = todo[future]
       print(">", filepath)
       try:
