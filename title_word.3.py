@@ -9,7 +9,7 @@ def main():
   total_txt, count_txt = total_count("title_word.2")
   total_txt += 1
   r = []
-  for k, v in total_title.items():
+  for k, v in count_title.items():
     p = (v * total_txt) / ((count_txt.get(k, 0) + 1) * total_title)
     r.append((k, p))
   for i in sorted(r, key=itemgetter(1)):
