@@ -4,10 +4,23 @@ from cn import tokenize, RE_PUNCTUATION
 from nltk import ngrams
 from collections import Counter, defaultdict
 from operator import itemgetter
-from acora import AcoraBuilder
-from itertools import groupby
+from os.path import join, dirname, abspath
 
 utf8 = 'utf8'
+
+_DIR = dirname(abspath(__file__))
+
+
+def total_count(filename):
+  count = {}
+  with open(join(_DIR, filename + ".txt")) as f:
+    it = iter(f)
+    total = int(next(it)[:-1])
+    for i in f:
+      word, n = i.rstrip("\n").rsplit(",", 1)
+      word = tuple(tokenize(word))
+      count[word] = int(n)
+  return total, count
 
 
 def ngram(li, size):
@@ -80,7 +93,6 @@ def word_join(li):
 
 def run(outfile, parse_word):
   from os import walk, cpu_count
-  from os.path import join, dirname, basename, abspath
   # from concurrent.futures import ThreadPoolExecutor as ProcessPoolExecutor, as_completed
   from concurrent.futures import ProcessPoolExecutor, as_completed
   from tqdm import tqdm
