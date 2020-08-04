@@ -138,7 +138,7 @@ if __name__ == "__main__":
         print("Exception", exc)
       else:
         parse(*r)
-        min_n = max(int(parse.total * 0.00001), 3)
+        min_n = max(int(parse.total * 0.000001), 3)
         t = [str(parse.total)]
         for k, v in sorted(parse.count.items(), key=itemgetter(1), reverse=True):
           if v > min_n:
