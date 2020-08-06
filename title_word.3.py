@@ -11,7 +11,7 @@ def main():
   r = []
   for k, v in count_title.items():
     p = (v * total_txt) / ((count_txt.get(k, 0) + 1) * total_title)
-    r.append((word_join(k), int(p * 100000000)))
+    r.append((word_join(k), int(p * 1000000)))
   for i in sorted(r, key=itemgetter(1), reverse=True):
     print("%s,%s" % i)
 
