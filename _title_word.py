@@ -104,7 +104,7 @@ def run(outfile, parse_word):
   parse = Parse()
   with ProcessPoolExecutor(max_workers=cpu_count()) as executor:
     todo = {}
-    for root, _, file_li in walk("/share/txt/data"):
+    for root, _, file_li in walk("/share/txt/cn"):
       for filename in file_li:
         if filename.endswith(".zd"):
           filepath = join(root, filename)
