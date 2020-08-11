@@ -106,7 +106,7 @@ def run(outfile, parse_word):
     todo = {}
     for root, _, file_li in walk("/share/txt/cn"):
       for filename in file_li:
-        if filename.endswith(".zd"):
+        if filename.endswith(".zstd"):
           filepath = join(root, filename)
           # _parse(filepath)
           todo[executor.submit(_parse,
